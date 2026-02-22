@@ -135,40 +135,115 @@ Hardware Eval→ Crypto Sim   → E2E Alpha   → System Freeze
 
 ## Part 3: Role-Specific Implementation Analysis
 
-### 3.1 Network Architect (เจม)
-**Key Challenges:** เอาชนะข้อจำกัดของ TCP/IP ที่ไม่รองรับกระแสประสาทแบบต่อเนื่อง
-**Implementation Checklist:**
-- [ ] TTP Header format defined.
-- [ ] Symbolic routing simulator up and running.
-- [ ] Latency profiling scripts integrated.
+### 3.1 Network Architect's Implementation Analysis (เจม)
 
-### 3.2 Security Specialist (รักบี้)
-**Key Challenges:** ป้องกันการป้อนข้อมูลความรู้สึกเทียมเข้าสู่สมองเป้าหมาย และตัดการเชื่อมต่อทันทีที่ระดับความเครียดสูง
-**Implementation Checklist:**
-- [ ] Threat model documented.
-- [ ] Inbound/Outbound filter ruleset coded.
-- [ ] Consensual handshake logic simulated.
+**Core Implementation Tasks:**
 
-### 3.3 BCI Engineer (บี)
-**Key Challenges:** ปัญหา Signal-to-noise ratio ในอุปกรณ์แบบ Non-invasive และการขจัดคลื่นแทรกซ้อน (Artifacts)
-**Implementation Checklist:**
-- [ ] Hardware baseline configured.
-- [ ] Neural Dictionary dataset collected.
-- [ ] ML Classifier trained for minimum 3 discrete states.
+Priority 1 (Must Have):
+├── TTP Header Definition
+├── Symbolic Routing Simulator
+├── Contextual Framing Logic
+└── TCP/IP Limitation Report
 
-### 3.4 Neuroethics Lead (โอเล่)
-**Key Challenges:** การตั้งค่าเกณฑ์จำแนกระหว่างจิตใต้สำนึกส่วนตัว กับความตั้งใจที่จะส่งข้อมูลออกไป
-**Implementation Checklist:**
-- [ ] Cognitive Liberty framework drafted.
-- [ ] Privacy bounding rules defined for the Firewall.
-- [ ] Final compliance audit report completed.
+Priority 2 (Should Have):
+├── Route caching for frequent thoughts
+├── Multi-path contextual routing
+└── E2E Simulator integration
 
-### 3.5 Quantum Specialist (โยรุ)
-**Key Challenges:** การจำลองความปลอดภัยระดับ Post-Quantum ลงในระบบจำลองด้วยทรัพยากรปัจจุบัน
-**Implementation Checklist:**
-- [ ] Post-Quantum roadmap defined.
-- [ ] Classical-AI encryption fallback pipeline implemented.
-- [ ] Encryption latency meets Phase 1 requirements.
+Priority 3 (Nice to Have):
+├── Visual Packet Tracer GUI
+└── Advanced Traffic Metrics
+
+**Technical Challenges:**
+- เอาชนะข้อจำกัดของ TCP/IP ที่ไม่รองรับกระแสประสาทแบบต่อเนื่อง (Continuous temporal dimension)
+- การรักษา Latency ให้ต่ำกว่า 50ms หักลบเวลาประมวลผล Header
+- Simulation performance with multiple brain nodes
+
+### 3.2 BCI Engineer's Implementation Analysis (บี)
+
+**Core Implementation Tasks:**
+
+Priority 1 (Must Have):
+├── Hardware Baseline Setup
+├── EEG Data Acquisition Script
+├── Noise Filtering Pipeline
+└── Basic ML Classifier (3 States)
+
+Priority 2 (Should Have):
+├── Real-time decoding loop
+├── Neural Dictionary Versioning
+└── Artifact Rejection logic
+
+Priority 3 (Nice to Have):
+├── Advanced 5-State Classifier
+└── Brainwave Visualization Dashboard
+
+**Technical Challenges:**
+- ปัญหา Signal-to-noise ratio ในอุปกรณ์แบบ Non-invasive
+- การขจัดคลื่นแทรกซ้อน (Artifacts) แบบ Real-time
+- Tradeoff ระหว่างความเร็วในการประมวลผล (Speed) กับความแม่นยำ (Accuracy)
+
+### 3.3 Security Specialist's Implementation Analysis (รักบี้)
+
+**Firewall Rules Implementation:**
+
+| Rule | Implementation Complexity | Validation Method |
+|------|--------------------------|-------------------|
+| Consensual Handshake | High | Unit tests with simulated stress triggers |
+| Semantic Injection Block | High | Packet inspection & semantic rejection |
+| Emotional Overflow Limit | Medium | Threshold validation (Arousal > MAX) |
+| Emergency Session Teardown | Low | Connection state termination tests |
+
+**Technical Challenges:**
+- ป้องกันการป้อนข้อมูลความรู้สึกเทียมหรือคำสั่งจิตใต้สำนึก (Semantic Injection)
+- การตัดการเชื่อมต่อแบบ Soft-disconnect ไม่ให้เกิดอาการกระตุก (Neural shock)
+
+### 3.4 Neuroethics Lead's Implementation Analysis (โอเล่)
+
+**Domain Rules Implementation:**
+
+| Rule | Implementation Complexity | Validation Method |
+|------|--------------------------|-------------------|
+| Cognitive Liberty Bounds | High | Scenario-based Ethics Audit |
+| Private Thought Isolation | Medium | Threat Model boundary checks |
+| Subconscious Consent | High | Simulated consent pattern validation |
+| Data Purge on Reject | Low | Inspecting memory/log leaks post-session |
+
+**Research Requirements:**
+- [ ] Review literature on BCI privacy and human rights frameworks
+- [ ] Document 5 edge cases for "Accidental Broadcasting"
+- [ ] Create mathematical bounds for Valence/Arousal safety levels
+- [ ] Define "Coercion Indicators" for the Brain Firewall
+
+### 3.5 Quantum Specialist's Implementation Analysis (โยรุ)
+
+**Core Implementation Tasks:**
+
+Priority 1 (Must Have):
+├── AES-256 Classic Fallback Setup
+├── Key Exchange Simulator (Mock QKD)
+└── Encryption Latency Profiler
+
+Priority 2 (Should Have):
+├── Quantum Algorithm Roadmap
+└── Threat Model Documentation
+
+**Research Requirements:**
+- [ ] Research practical QKD implementations for continuous neural streams
+- [ ] Evaluate Post-Quantum Cryptography (PQC) standards (NIST)
+- [ ] Document mathematical models for Phase 2 integration
+
+### 3.6 DevOps & Infrastructure Analysis (Shared)
+
+**Infrastructure Requirements:**
+
+| Component | Technology | Configuration |
+|-----------|------------|---------------|
+| Version Control | GitHub | Branch protection, Code reviews |
+| CI/CD | GitHub Actions | Python 3.10+, Linting, Auto-test |
+| Documentation | MkDocs | Material theme, Auto-deploy |
+| Testing | pytest | Coverage reporting (>80%) |
+| Dependencies | pip | requirements.txt, Virtual Environments |
 
 ---
 
