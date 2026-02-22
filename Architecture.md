@@ -1,110 +1,121 @@
+# Brain-Net Architecture Specification v1.0
+**Architectural Review Document - Brain-Net Project**
 
-# 🧠 Brain-Net Architecture Specification v1.0  
-### Architectural Review Document – New Network / Brain-Net Project
-
----
-
-## 📌 Document Control
-
+## Document Control
 | Version | Date | Author | Role | Changes |
-|----------|--------|--------|--------|----------|
+|---------|------|--------|------|---------|
 | v1.0 | 2026-02-22 | Brain-Net Project Team | Architecture Committee | Initial Architectural Review |
 
----
-
-# 👥 Team Roles & Responsibilities
-
-| Role | Name | Focus Area |
-|------|------|------------|
-| 🏗 Network Architect | นายปฏิภาณ ปานทะเล (เจม) | Core Architecture Design, TCP/IP Limitation Analysis |
-| 🔐 Security Specialist | นายอาณัฐ อารีย์ (รักบี้) | Cybersecurity, Cognitive Intrusion Prevention |
-| 🧠 BCI Engineer | นายณัฐชา อรรคฮาต (บี) | Brain-Computer Interface & Physical Connectivity |
-| ⚖ Neuroethics Lead | นายรัชชานนท์ ประดับแก้ว (โอเล่) | Neuroethics, Identity & Hive Mind Boundary |
-| ⚛ Quantum Specialist | นายดรัณภพ สุริเตอร์ (โยรุ) | Quantum Decoding & QKD Encryption |
+## Team Roles
+| Role | Name | Responsibilities |
+|------|------|------------------|
+| **Network Architect** | นายปฏิภาณ ปานทะเล (เจม) | Core Architecture Design, TCP/IP Limitation Analysis |
+| **Security Specialist** | นายอาณัฐ อารีย์ (รักบี้) | Cybersecurity, Cognitive Intrusion Prevention |
+| **BCI Engineer** | นายณัฐชา อรรคฮาต (บี) | Brain-Computer Interface & Physical Connectivity |
+| **Neuroethics Lead** | นายรัชชานนท์ ประดับแก้ว (โอเล่) | Neuroethics, Identity & Hive Mind Boundary |
+| **Quantum Specialist** | นายดรัณภพ สุริเตอร์ (โยรุ) | Quantum Decoding & QKD Encryption |
 
 ---
 
-# 🚀 Part 1: Executive Summary
+## Part 1: Executive Summary
 
-## Project Vision
+### 1.1 Project Vision
+Brain-Net (Mind-to-Mind Network) คือสถาปัตยกรรมเครือข่ายรูปแบบใหม่ที่ออกแบบมาเพื่อการสื่อสารระหว่างจิตใจมนุษย์โดยตรง ระบบนี้ทำหน้าที่เป็น **Exocortex (เปลือกสมองภายนอก)** ที่เชื่อมโยงมนุษย์เข้าด้วยกันในระดับความคิด ความรู้สึก และจิตสำนึก เพื่อก้าวข้ามข้อจำกัดของการสื่อสารผ่านภาษาพูดแบบดั้งเดิม
 
-Brain-Net (Mind-to-Mind Network) คือสถาปัตยกรรมเครือข่ายรูปแบบใหม่ที่ออกแบบมาเพื่อการสื่อสารระหว่างจิตใจมนุษย์โดยตรง  
+### 1.2 Core Challenges (Why Not TCP/IP?)
+- **The Qualia Problem:** TCP/IP ส่งข้อมูลแบบ Static Data แต่สมองต้องการ Dynamic Neural State ความรู้สึก (Qualia) ไม่ใช่แพ็กเก็ตข้อมูลธรรมดา
+- **Latency & Synchronization:** สมองทำงานแบบ Real-Time Continuous Flow หากมี Lag เพียงเล็กน้อยจะเกิดความสับสน (Neural Dissonance)
+- **The Ultimate Firewall:** หากเครือข่ายนี้ถูกแฮ็ก จะหมายถึงการสูญเสียตัวตน (Identity) ซึ่งมีความเสี่ยงสูงกว่าการขโมยข้อมูลทั่วไปอย่างมหาศาล
 
-ระบบนี้ทำหน้าที่เป็น **Exocortex (เปลือกสมองภายนอก)** ที่เชื่อมโยงมนุษย์เข้าด้วยกันในระดับความคิด ความรู้สึก และจิตสำนึก
-
----
-
-## Why Not TCP/IP?
-
-### 🧩 The Qualia Problem
-- TCP/IP ส่งข้อมูลแบบ Static Data  
-- สมองต้องการ Dynamic Neural State  
-- ความรู้สึก (Qualia) ไม่ใช่แพ็กเก็ตข้อมูลธรรมดา  
-
-### ⏱ Latency & Synchronization
-- สมองทำงานแบบ Real-Time Continuous Flow  
-- Lag เพียงเล็กน้อย → Neural Dissonance  
-
-### 🔥 The Ultimate Firewall
-- หากถูกแฮ็ก = สูญเสีย Identity  
-- ความเสี่ยงสูงกว่าการขโมยข้อมูลทั่วไป  
+### 1.3 Foundation Prerequisites
+ก่อนที่ระบบจะสามารถทำงานได้อย่างบูรณาการ จำเป็นต้องวางรากฐาน 3 ด้าน:
+1. **Neuroethics & Cognitive Liberty:** รับรองสิทธิที่จะไม่ถูกอ่านความคิด และสิทธิในความเป็นเจ้าของตัวตน
+2. **Standardized Neural Protocol:** พัฒนาระบบ AI Translator ข้ามบุคคล และ Neural Standardization Framework
+3. **Post-Quantum Security:** ระบบความปลอดภัยต้องสมบูรณ์แบบระดับ Zero-Trust Neural Architecture ก่อนเปิดใช้งานจริง
 
 ---
 
-# 🏗 Part 2: Architectural Blueprint
+## Part 2: Architectural Review
 
-## Brain-Net Protocol Stack
+### 2.1 Architecture Overview
 
 ```
-┌──────────────────────────────────────────────┐
-│               Brain-Net Stack               │
-├──────────────────────────────────────────────┤
-│ Quantum Layer      │ QKD + Quantum Decode   │
-├──────────────────────────────────────────────┤
-│ Session/Security   │ Consensual Handshake   │
-├──────────────────────────────────────────────┤
-│ Protocol Layer     │ Thought Transfer (TTP) │
-├──────────────────────────────────────────────┤
-│ Context Layer      │ Contextual Framing     │
-├──────────────────────────────────────────────┤
-│ Physical Layer     │ Neural Dust / BCI      │
-└──────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Brain-Net Protocol Stack                   │
+├─────────────────────────────────────────────────────────────┤
+│  Application Layer    │ Qualia Sharing, Empathic Resonance  │
+├─────────────────────────────────────────────────────────────┤
+│  Presentation Layer   │ AI Translator, Universal Language   │
+├─────────────────────────────────────────────────────────────┤
+│  Session Layer        │ Consensual Handshake                │
+├─────────────────────────────────────────────────────────────┤
+│  Transport/Network    │ Thought Transfer Protocol (TTP)     │
+├─────────────────────────────────────────────────────────────┤
+│  Data Link Layer      │ Contextual Framing Layer            │
+├─────────────────────────────────────────────────────────────┤
+│  Physical Layer       │ Neural Dust, Non-Invasive BCI       │
+│  Security Sub-Layer   │ QKD + Quantum Decoding              │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+### 2.2 Layer-by-Layer Architecture Review
+
+#### 2.2.1 Physical Layer & BCI Interface
+**Design Review Status: 🔄 In Progress (Phase 1 Focus)**
+
+| Aspect | Assessment | Notes |
+|--------|------------|-------|
+| Hardware | Non-Invasive | Evaluating signal-to-noise ratios |
+| Acquisition | Continuous | Requires real-time artifact filtering |
+| Interpretation| ML-based | Building initial Neural Dictionary |
+
+#### 2.2.2 Contextual Framing Layer
+**Design Review Status: ⚠️ Needs Specification**
+หน้าที่หลักคือการรับข้อมูลดิบจาก Physical Layer มาแนบ Metadata เช่น อารมณ์ (Emotion) หรือบริบทแวดล้อม ทำให้ข้อมูลที่ส่งไปมีความหมายมากกว่าสัญลักษณ์นิ่งๆ
+
+#### 2.2.3 Thought Transfer Protocol (TTP)
+**Design Review Status: ⚠️ Needs Specification**
+โปรโตคอลหลักที่ใช้ส่งข้อมูลผ่านเครือข่าย ออกแบบมาเพื่อลด Latency ให้ต่ำที่สุด (เป้าหมาย < 50ms) และรองรับคุณสมบัติ Symbolic parallel transmission แทนที่ TCP/IP รูปแบบเดิม
+
+#### 2.2.4 Consensual Handshake
+**Design Review Status: 🔄 In Progress**
+ระบบ Session Management ที่อาศัยการอนุญาตระดับจิตใต้สำนึก (Subconscious-level authorization) โดยมีกลไกตัดการเชื่อมต่ออัตโนมัติหากพบสัญญาณความเครียดระดับสูงหรือการบีบบังคับ
+
+#### 2.2.5 Application & Presentation
+**Design Review Status: � Planned for Future Phases**
+รองรับการแปลงสัญญาณเป็น "Universal Thought Language" และการสื่อสารระดับ Qualia (ความรู้สึก) และ Sensory Casting ในอนาคต
 
 ---
 
-# 🛣 Part 3: Strategic Roadmap
+## Part 3: Strategic Roadmap
 
 | Phase | Timeline | Name | Objective | Key Tech |
-|--------|------------|------------|----------------|----------------|
-| 1 | Present–2040 | Synthetic Telepathy | ส่งข้อความสั้น | BCI, Neural Dictionary |
-| 2 | 2040–2060 | Sensory Casting | ส่งภาพ/เสียง/กลิ่น | AI Visual Decoding |
-| 3 | 2060–2100 | Empathic Resonator | ส่งอารมณ์ลึก | Emotional Codec |
-| 4 | 2100–2500 | Hive Mind | เชื่อมต่อไร้รอยต่อ | Post-Language Model |
-| 5 | 2500+ | Transcendence | Upload Consciousness | Full Mind Mapping |
+|-------|----------|------|-----------|----------|
+| **1** | Present–2040 | Synthetic Telepathy | ส่งข้อความสั้น, คำสั่งพื้นฐาน | BCI, Neural Dictionary |
+| **2** | 2040–2060 | Sensory Casting | ส่งภาพ/เสียง/กลิ่น | AI Visual Decoding |
+| **3** | 2060–2100 | Empathic Resonator| ส่งอารมณ์ลึกซึ้ง | Emotional Codec |
+| **4** | 2100–2500 | Hive Mind | เชื่อมต่อไร้รอยต่อระหว่างสมอง | Post-Language Model |
+| **5** | 2500+ | Transcendence | อัพโหลดจิตสำนึกระดับลึก | Full Mind Mapping |
 
 ---
 
-# 🏛 Part 4: Foundation Prerequisites
+## Part 4: Architectural Review Sign-off
 
-## 1️⃣ Neuroethics & Cognitive Liberty
-- สิทธิไม่ถูกอ่านความคิด  
-- สิทธิในความเป็นเจ้าของตัวตน  
+| Role | Name | Signature | Date | Comments |
+|------|------|-----------|------|----------|
+| Network Architect | นายปฏิภาณ ปานทะเล (เจม) | | | |
+| Security Specialist | นายอาณัฐ อารีย์ (รักบี้) | | | |
+| BCI Engineer | นายณัฐชา อรรคฮาต (บี) | | | |
+| Neuroethics Lead | นายรัชชานนท์ ประดับแก้ว (โอเล่)| | | |
+| Quantum Specialist | นายดรัณภพ สุริเตอร์ (โยรุ) | | | |
 
-## 2️⃣ Standardized Neural Protocol
-- AI Translator ข้ามบุคคล  
-- Neural Standardization Framework  
-
-## 3️⃣ Post-Quantum Security
-- ระบบความปลอดภัยต้องสมบูรณ์ก่อนเปิดใช้งาน  
-- Zero-Trust Neural Architecture  
+**Review Outcome:** ⚠️ Conditional Approval (Phase 1 Focused)
+**Conditions:**
+1. กำหนดข้อกำหนดทางเทคนิค (Specification) ของ TTP Header ภายใน 2 สัปดาห์
+2. ยืนยันแผนการทดสอบ Neural Dictionary ขั้นพื้นฐาน
+3. ร่างคู่มือ Cognitive Liberty ขั้นต้นให้แล้วเสร็จ
 
 ---
 
-# 🔮 Closing Vision
-
-Brain-Net ไม่ใช่เพียงเครือข่ายใหม่  
-แต่คือการเปลี่ยนแปลงโครงสร้างการสื่อสารของมนุษยชาติ  
-
-> จาก "การพูดภาษา"  
-> สู่ "การแลกเปลี่ยนจิตสำนึก"
+**Closing Vision:**
+Brain-Net ไม่ใช่เพียงเครือข่ายใหม่ แต่คือการเปลี่ยนแปลงโครงสร้างการสื่อสารของมนุษยชาติ จาก "การพูดภาษา" สู่ "การแลกเปลี่ยนจิตสำนึก"
