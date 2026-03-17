@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "brain-net"
+version = "1.0.0"
+description = "Brain-Net Protocol — Thought Transfer Protocol with Cognitive Liberty Protection"
+requires-python = ">=3.10"
+dependencies = [
+    "scikit-learn>=1.3.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "mne>=1.5.0",
+    "cryptography>=41.0.0",
+    "scipy>=1.11.0",
+    "joblib>=1.3.0",
+    "matplotlib>=3.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*", "data/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true

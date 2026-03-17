@@ -1,0 +1,27 @@
+name: Brain-Net CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run tests with coverage
+      run: pytest tests/ --cov=src/ --cov-report=xml --cov-fail-under=80 -v
+
+    - name: Ethics Rule Verification
+      run: python -c "from src.security.ethics_rule_engine import EthicsRuleEngine; e = EthicsRuleEngine(); print('Ethics Engine OK:', len(e.rules), 'rules loaded')"

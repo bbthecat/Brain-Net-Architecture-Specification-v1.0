@@ -1,0 +1,73 @@
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+sdist/
+wheels/
+*.whl
+
+# ── Virtual Environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# ── Brain-Net Sensitive Data (NEVER commit) ───────────────────────────────────
+# Raw EEG data — contains neural data
+data/raw_eeg/
+data/*.edf
+data/*.bdf
+data/*.fif
+
+# Trained ML models (large binaries)
+models/
+!models/.gitkeep
+
+# Generated reports
+reports/
+!reports/.gitkeep
+
+# Generated mock dataset (reproducible via generate_mock_dataset.py)
+data/clean_eeg_data.csv
+
+# Audit logs — may contain hashed user data
+logs/
+audit_logs/
+*.audit.json
+
+# Ethics certificates — sign manually, never auto-commit
+docs/ethics/*certificate*.md
+docs/ethics/*SIGNED*
+
+# ── Testing & Coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.cover
+.hypothesis/
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── CI Artifacts ─────────────────────────────────────────────────────────────
+*.log
+*.tmp
