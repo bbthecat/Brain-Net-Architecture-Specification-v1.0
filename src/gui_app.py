@@ -32,6 +32,7 @@ class BrainNetGUI:
         self.m_p95: Optional[tk.StringVar] = None
         self.m_consent: Optional[tk.StringVar] = None
         self.m_success: Optional[tk.StringVar] = None
+        self.m_daft: Optional[tk.StringVar] = None
         self.m_ethics: Optional[tk.StringVar] = None
         self.m_pmi: Optional[tk.StringVar] = None
 
@@ -117,6 +118,7 @@ class BrainNetGUI:
         self.m_p95 = self._add_metric(metrics_box, "P95 Latency:", "0.0 ms")
         self.m_consent = self._add_metric(metrics_box, "Consent Score:", "0.00")
         self.m_success = self._add_metric(metrics_box, "Success Rate:", "0.0%")
+        self.m_daft = self._add_metric(metrics_box, "DAFT Pass Rate:", "0.0%")
         self.m_ethics = self._add_metric(metrics_box, "Ethics Compliance:", "0.0%")
         self.m_pmi = self._add_metric(metrics_box, "PMI Score:", "0.0")
 
@@ -207,7 +209,12 @@ class BrainNetGUI:
         ethics_rate = (sum(1 for r, cs in results if r.ethics_decision == 'ALLOW') / n) * 100
         avg_consent = sum(cs for r, cs in results) / n
         
-        self.log_queue.put(("METRIC", (f"{p95:.1f} ms", f"{avg_consent:.2f}", f"{success_rate:.1f}%", f"{ethics_rate:.1f}%")))
+        # Get DAFT pass rate and PMI from pipeline metrics
+        daft_rate = self.pipeline.metrics.daft_pass_rate() * 100
+        pmi_data = self.pipeline.metrics.compute_pmi()
+        pmi_score = pmi_data["overall"]
+        
+        self.log_queue.put(("METRIC", (f"{p95:.1f} ms", f"{avg_consent:.2f}", f"{success_rate:.1f}%", f"{daft_rate:.1f}%", f"{ethics_rate:.1f}%", f"{pmi_score}")))
 
     def _write_log(self, category, msg):
         self.log_queue.put((category, msg))
@@ -217,11 +224,13 @@ class BrainNetGUI:
             while True:
                 category, msg = self.log_queue.get_nowait()
                 if category == "METRIC":
-                    p95, consent, succ, eth = msg
+                    p95, consent, succ, daft, eth, pmi = msg
                     self.m_p95.set(p95)
                     self.m_consent.set(consent)
                     self.m_success.set(succ)
+                    self.m_daft.set(daft)
                     self.m_ethics.set(eth)
+                    self.m_pmi.set(pmi)
                 elif category == "STREAM":
                     self.log_area.insert(tk.END, f"{msg}\n")
                     self.log_area.see(tk.END)
