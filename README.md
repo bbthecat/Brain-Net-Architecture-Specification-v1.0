@@ -1,4 +1,4 @@
-# 🧠 Brain-Net Protocol — Phase 1
+# 🧠 Brain-Net Protocol — Phase 1 MVP
 
 **Brain-Computer Interface Neural Communication Protocol**
 *Thought Transfer Protocol (TTP) with Cognitive Liberty Protection*
@@ -39,7 +39,8 @@ brain-net/
 │   │   ├── __init__.py
 │   │   └── quality_metrics.py  # QualityMetrics + PMI
 │   ├── brain_net_pipeline.py   # Full E2E Pipeline Orchestrator
-│   └── gui_app.py              # 5. Run Interactive GUI Dashboard (Recommended)
+    ├── gui_app.py              # Desktop GUI (Tkinter)
+    └── web_gui.py              # 🚀 Modern Web GUI Dashboard (Recommended)
 ├── tests/
 │   ├── conftest.py             # Shared pytest fixtures
 │   ├── unit/                   # Unit tests (fast, isolated)
@@ -106,14 +107,20 @@ python -m src.bci.neural_classifier
 # 4. Run full pipeline demo
 python -m src.brain_net_pipeline
 
-# 5. Run all tests
-pytest tests/ --cov=src/ --cov-report=term-missing
+# 5. Run Modern Web GUI (Recommended)
+streamlit run src/web_gui.py
 
-# 6. Run only unit tests (fast)
-pytest tests/unit/ -v
+# 6. Run Classic Desktop GUI
+python src/gui_app.py
 
-# 7. Run E2E tests
-pytest tests/e2e/ -v
+# 7. Run all tests
+python -m pytest tests/ --cov=src/ --cov-report=term-missing
+
+# 8. Run only unit tests (fast)
+python -m pytest tests/unit/ -v
+
+# 9. Run E2E tests
+python -m pytest tests/e2e/ -v
 ```
 
 ---
