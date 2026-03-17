@@ -30,6 +30,7 @@ class BrainNetGUI:
         self.run_btn: Optional[ttk.Button] = None
         self.log_area: Optional[scrolledtext.ScrolledText] = None
         self.m_p95: Optional[tk.StringVar] = None
+        self.m_consent: Optional[tk.StringVar] = None
         self.m_success: Optional[tk.StringVar] = None
         self.m_ethics: Optional[tk.StringVar] = None
         self.m_pmi: Optional[tk.StringVar] = None
@@ -114,6 +115,7 @@ class BrainNetGUI:
         metrics_box.pack(fill="x")
 
         self.m_p95 = self._add_metric(metrics_box, "P95 Latency:", "0.0 ms")
+        self.m_consent = self._add_metric(metrics_box, "Consent Score:", "0.00")
         self.m_success = self._add_metric(metrics_box, "Success Rate:", "0.0%")
         self.m_ethics = self._add_metric(metrics_box, "Ethics Compliance:", "0.0%")
         self.m_pmi = self._add_metric(metrics_box, "PMI Score:", "0.0")
@@ -128,12 +130,13 @@ class BrainNetGUI:
 
     def _start_session(self):
         self._write_log("System", "Requesting consensual handshake...")
-        success = self.pipeline.open_session(consent=0.92)
+        consent_val = 0.92
+        success = self.pipeline.open_session(consent=consent_val)
         if success:
             self.session_status.config(text="STATUS: CONNECTED (ACTIVE)", foreground="#00E676")
             self.run_btn["state"] = "normal"
             self.start_btn["state"] = "disabled"
-            self._write_log("Security", "Consensual Session Established. Neurorights Verified.")
+            self._write_log("Security", f"Consensual Session Established. Consent Score: {consent_val:.2f}. Neurorights Verified.")
         else:
             self._write_log("Security", "Handshake REJECTED. Consent score below threshold.")
             messagebox.showerror("Security Error", "Consensual Handshake Failed.")
@@ -173,12 +176,13 @@ class BrainNetGUI:
             thought = random.choice(["focus", "relax", "neutral"]) if domain == Domain.NEURO else "sensor_data"
             
             # Run actual pipeline transmission
-            res = self.pipeline.transmit(domain, thought, consent_score=random.uniform(0.75, 0.98))
-            results.append(res)
+            cs = random.uniform(0.75, 0.98)
+            res = self.pipeline.transmit(domain, thought, consent_score=cs)
+            results.append((res, cs))
             
             # Push to UI queue
             status = "SENT" if res.success else f"BLOCKED ({res.ethics_decision})"
-            log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] PKT {i:03d} | {res.symbol.upper():<8} | Latency: {res.latency_ms:4.1f}ms | {status}"
+            log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] PKT {i:03d} | {res.symbol.upper():<8} | CS: {cs:.2f} | Latency: {res.latency_ms:4.1f}ms | {status}"
             self.log_queue.put(("STREAM", log_msg))
             
             # Update Metrics calculation
@@ -194,15 +198,16 @@ class BrainNetGUI:
     def _update_metrics_live(self, results):
         if not results: return
         
-        latencies = [r.latency_ms for r in results]
+        latencies = [r.latency_ms for r, cs in results]
         latencies.sort()
         n = len(latencies)
         p95 = latencies[int(n*0.95)] if n > 0 else 0
         
-        success_rate = (sum(1 for r in results if r.success) / n) * 100
-        ethics_rate = (sum(1 for r in results if r.ethics_decision == 'ALLOW') / n) * 100
+        success_rate = (sum(1 for r, cs in results if r.success) / n) * 100
+        ethics_rate = (sum(1 for r, cs in results if r.ethics_decision == 'ALLOW') / n) * 100
+        avg_consent = sum(cs for r, cs in results) / n
         
-        self.log_queue.put(("METRIC", (f"{p95:.1f} ms", f"{success_rate:.1f}%", f"{ethics_rate:.1f}%")))
+        self.log_queue.put(("METRIC", (f"{p95:.1f} ms", f"{avg_consent:.2f}", f"{success_rate:.1f}%", f"{ethics_rate:.1f}%")))
 
     def _write_log(self, category, msg):
         self.log_queue.put((category, msg))
@@ -212,8 +217,9 @@ class BrainNetGUI:
             while True:
                 category, msg = self.log_queue.get_nowait()
                 if category == "METRIC":
-                    p95, succ, eth = msg
+                    p95, consent, succ, eth = msg
                     self.m_p95.set(p95)
+                    self.m_consent.set(consent)
                     self.m_success.set(succ)
                     self.m_ethics.set(eth)
                 elif category == "STREAM":
