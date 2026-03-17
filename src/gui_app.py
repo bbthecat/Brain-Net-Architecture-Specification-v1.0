@@ -8,6 +8,9 @@ from datetime import datetime
 from typing import Optional
 
 # Import backend pipeline
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brain_net_pipeline import BrainNetPipeline, Domain
 
 class BrainNetGUI:
