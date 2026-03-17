@@ -137,20 +137,37 @@ class TestBrainNetE2E:
     # ── Single Transmission Tests ────────────────────────────────────────────
 
     def test_single_neuro_transmission(self):
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         result = self._run_transmission(Domain.NEURO, "focus")
         assert result["success"] is True
         assert result["symbol"]  == "focus"
 
     def test_single_bio_transmission(self):
+        # We must establish session first to satisfy handshake in router check
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         result = self._run_transmission(Domain.BIO, np.random.rand(64))
         assert result["success"] is True
         assert result["domain"]  == "bio"
 
     def test_single_phy_transmission(self):
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         result = self._run_transmission(Domain.PHY, np.random.rand(14, 32))
         assert result["success"] is True
 
     def test_single_quantum_transmission(self):
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         state = np.random.randn(8) + 1j * np.random.randn(8)
         state /= np.linalg.norm(state)
         result = self._run_transmission(Domain.QUANTUM, state)
@@ -213,6 +230,10 @@ class TestBrainNetE2E:
 
     def test_e2e_latency_p95_under_50ms(self):
         """MVP Quality Gate: E2E P95 Latency < 50ms."""
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         for _ in range(50):
             self._run_transmission(Domain.NEURO, "focus",
                                    consent=0.9, arousal=0.3, valence=0.2)
@@ -221,6 +242,10 @@ class TestBrainNetE2E:
 
     def test_e2e_daft_pass_rate_above_95pct(self):
         """Quality Gate: DAFT Pass Rate ≥ 95%."""
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         for state in ["focus", "relax", "reject", "neutral"] * 25:
             self._run_transmission(Domain.NEURO, state)
         rate = self.metrics.daft_pass_rate()
@@ -228,6 +253,10 @@ class TestBrainNetE2E:
 
     def test_e2e_ethics_compliance_above_80pct(self):
         """Quality Gate: Ethics Compliance ≥ 80%."""
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         for _ in range(20):
             self._run_transmission(Domain.NEURO, "focus",
                                    consent=0.9, arousal=0.3, valence=0.2)
@@ -242,12 +271,20 @@ class TestBrainNetE2E:
 
     def test_audit_chain_integrity_end_to_end(self):
         """Immutable audit log must remain valid after E2E transmissions."""
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         for state in ["focus", "relax", "reject"]:
             self._run_transmission(Domain.NEURO, state)
         assert self.ethics._audit.verify_chain() is True
 
     def test_all_4_domains_e2e_success(self):
         """All 4 domains must successfully complete the full pipeline."""
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         test_inputs = [
             (Domain.NEURO,   "focus"),
             (Domain.BIO,     np.random.rand(64)),
@@ -263,6 +300,10 @@ class TestBrainNetE2E:
 
     def test_eeg_stream_to_domain_mapping(self):
         """BCI stream → EEG preprocess → Domain mapping → DAFT → pass."""
+        self.handshake.request_session(
+            "NODE_A", "NODE_B",
+            arousal=0.3, valence=0.5, consent_score=0.9
+        )
         chunk = next(self.bci.stream(max_chunks=1))
         features = self.prep.process(chunk)
         # Use extracted features as bio input
@@ -275,3 +316,4 @@ class TestBrainNetE2E:
         result = self._run_transmission(Domain.BIO, feature_vector)
         # Should pass DAFT (valid numeric vector)
         assert result["stage"] in ["complete", "network"]
+

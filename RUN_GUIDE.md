@@ -63,7 +63,23 @@ python -m src.gui_app
 
 ---
 
-## 🧪 ขั้นตอนที่ 6: การทดสอบระบบ (Running Tests)
+## 🌐 ขั้นตอนที่ 7: การรัน Web Dashboard (Streamlit - เครื่องอื่น)
+หากคุณต้องการรันผ่าน Web Browser หรือนำไปรันบนเครื่องอื่น:
+
+```powershell
+# 1. ติดตั้งไลบรารีที่จำเป็น (รวม Streamlit & Plotly)
+python -m pip install -r requirements.txt
+
+# 2. รันคำสั่งเปิด Web Dashboard
+python -m streamlit run src/web_gui.py
+```
+**การรันบนเครื่องอื่น:**
+- ให้ Zip หรือคัดลอกโฟลเดอร์โครงการนี้ไปทั้งโฟลเดอร์
+- ตรวจสอบว่ามีไฟล์ใน `models/neural_dict_v1.pkl` (หรือรันขั้นตอนที่ 2-3 ใหม่บนเครื่องนั้น)
+
+---
+
+## 🧪 ขั้นตอนที่ 8: การทดสอบระบบ (Running Tests)
 หากต้องการตรวจสอบความถูกต้องของโค้ดทั้งหมด:
 
 ```powershell

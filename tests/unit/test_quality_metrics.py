@@ -9,6 +9,9 @@ import json
 import os
 import tempfile
 import pytest
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from src.metrics.quality_metrics import QualityMetrics
 
 
@@ -141,3 +144,7 @@ class TestQualityMetrics:
             content = open(path, encoding="utf-8").read()
             assert "PMI" in content
             assert "Latency" in content
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

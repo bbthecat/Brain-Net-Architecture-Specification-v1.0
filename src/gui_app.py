@@ -4,6 +4,8 @@ import threading
 import queue
 import time
 import random
+import subprocess
+import re
 from datetime import datetime
 from typing import Optional
 
@@ -25,19 +27,32 @@ class BrainNetGUI:
         self.is_running = False
         self.stop_requested = False
         
-        # Initialize UI components with type hints for strict linting
-        self.estop_btn: Optional[ttk.Button] = None
-        self.session_status: Optional[ttk.Label] = None
-        self.start_btn: Optional[ttk.Button] = None
-        self.pkt_count_var: Optional[tk.StringVar] = None
-        self.run_btn: Optional[ttk.Button] = None
-        self.log_area: Optional[scrolledtext.ScrolledText] = None
-        self.m_p95: Optional[tk.StringVar] = None
-        self.m_consent: Optional[tk.StringVar] = None
-        self.m_success: Optional[tk.StringVar] = None
-        self.m_daft: Optional[tk.StringVar] = None
-        self.m_ethics: Optional[tk.StringVar] = None
-        self.m_pmi: Optional[tk.StringVar] = None
+        # UI State Variables
+        self.m_p95 = tk.StringVar(value="0.0 ms")
+        self.m_consent = tk.StringVar(value="0.00")
+        self.m_success = tk.StringVar(value="0.0%")
+        self.m_daft = tk.StringVar(value="0.0%")
+        self.m_ethics = tk.StringVar(value="0.0%")
+        self.m_pmi = tk.StringVar(value="0.0")
+        self.pkt_count_var = tk.StringVar(value="50")
+
+        # UI Widgets (initialized in _build_ui)
+        self.notebook: ttk.Notebook = None # type: ignore
+        self.dash_tab: ttk.Frame = None # type: ignore
+        self.test_tab: ttk.Frame = None # type: ignore
+        self.estop_btn: ttk.Button = None # type: ignore
+        self.session_status: ttk.Label = None # type: ignore
+        self.start_btn: ttk.Button = None # type: ignore
+        self.run_btn: ttk.Button = None # type: ignore
+        self.log_area: scrolledtext.ScrolledText = None # type: ignore
+        self.test_log_area: scrolledtext.ScrolledText = None # type: ignore
+        self.test_btn: ttk.Button = None # type: ignore
+
+        # Test Stats Variables
+        self.test_total_var = tk.StringVar(value="-")
+        self.test_pass_var = tk.StringVar(value="-")
+        self.test_fail_var = tk.StringVar(value="-")
+        self.test_cov_var = tk.StringVar(value="-")
 
         self._setup_styles()
         self._build_ui()
@@ -62,18 +77,26 @@ class BrainNetGUI:
         style.map("ESTOP.TButton", background=[("active", "#FF5252")])
 
     def _build_ui(self):
-        # --- Top Header ---
-        header_frame = ttk.Frame(self.root)
+        # Create Notebook for Tabs
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill="both", expand=True)
+
+        # --- Tab 1: Dashboard ---
+        self.dash_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.dash_tab, text=" 📊 Dashboard ")
+
+        # --- Top Header (Dashboard) ---
+        header_frame = ttk.Frame(self.dash_tab)
         header_frame.pack(fill="x", padx=20, pady=15)
         
-        ttk.Label(header_frame, text="🧠 BRAIN-NET PROTOCOL DASHBOARD", style="Header.TLabel").pack(side="left")
+        ttk.Label(header_frame, text="🧠 BRAIN-NET PROTOCOL CONTROL CENTER", style="Header.TLabel").pack(side="left")
         
         self.estop_btn = ttk.Button(header_frame, text="🛑 EMERGENCY STOP (E-STOP)", 
                                    style="ESTOP.TButton", command=self._trigger_estop)
         self.estop_btn.pack(side="right")
 
         # --- Main Content (Panels) ---
-        main_frame = ttk.Frame(self.root)
+        main_frame = ttk.Frame(self.dash_tab)
         main_frame.pack(fill="both", expand=True, padx=20)
 
         # Left Panel: Controls
@@ -87,7 +110,7 @@ class BrainNetGUI:
         self.session_status = ttk.Label(session_box, text="STATUS: DISCONNECTED", foreground="#FF5252")
         self.session_status.pack(pady=5)
         
-        self.start_btn = ttk.Button(session_box, text="Open Consensual Session", command=self._start_session)
+        self.start_btn = ttk.Button(session_box, text="Start Consensual Handshake", command=self._start_session)
         self.start_btn.pack(fill="x", pady=5)
 
         # Simulation Box
@@ -98,7 +121,7 @@ class BrainNetGUI:
         self.pkt_count_var = tk.StringVar(value="50")
         ttk.Entry(sim_box, textvariable=self.pkt_count_var).pack(fill="x", pady=5)
         
-        self.run_btn = ttk.Button(sim_box, text="▶ Run Simulation Pipeline", command=self._run_simulation)
+        self.run_btn = ttk.Button(sim_box, text="▶ Run Pipeline Simulation", command=self._run_simulation)
         self.run_btn.pack(fill="x", pady=10)
         self.run_btn["state"] = "disabled"
 
@@ -106,7 +129,7 @@ class BrainNetGUI:
         center_panel = ttk.Frame(main_frame)
         center_panel.pack(side="left", fill="both", expand=True)
         
-        ttk.Label(center_panel, text="LIVE TTP DATA STREAM", font=("Inter", 10, "bold")).pack(anchor="w")
+        ttk.Label(center_panel, text="REAL-TIME TTP DATA STREAM", font=("Inter", 10, "bold")).pack(anchor="w")
         self.log_area = scrolledtext.ScrolledText(center_panel, bg="#1E1E1E", fg="#A5D6A7", 
                                                  insertbackground="white", font=("JetBrains Mono", 9))
         self.log_area.pack(fill="both", expand=True, pady=5)
@@ -115,7 +138,7 @@ class BrainNetGUI:
         right_panel = ttk.Frame(main_frame, width=200)
         right_panel.pack(side="left", fill="y", padx=(10, 0))
         
-        metrics_box = ttk.LabelFrame(right_panel, text=" Real-time Metrics ", padding=10)
+        metrics_box = ttk.LabelFrame(right_panel, text=" Quality Metrics ", padding=10)
         metrics_box.pack(fill="x")
 
         self.m_p95 = self._add_metric(metrics_box, "P95 Latency:", "0.0 ms")
@@ -124,6 +147,72 @@ class BrainNetGUI:
         self.m_daft = self._add_metric(metrics_box, "DAFT Pass Rate:", "0.0%")
         self.m_ethics = self._add_metric(metrics_box, "Ethics Compliance:", "0.0%")
         self.m_pmi = self._add_metric(metrics_box, "PMI Score:", "0.0")
+
+        self.test_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.test_tab, text=" 🛡️ ศูนย์ทดสอบ (Test Center) ")
+        self._build_test_tab()
+
+    def _build_test_tab(self):
+        # Top Controls
+        ctrl_frame = ttk.Frame(self.test_tab, padding=20)
+        ctrl_frame.pack(fill="x")
+        
+        ttk.Label(ctrl_frame, text="✅ ระบบตรวจสอบความถูกต้อง (Verification)", style="Header.TLabel").pack(side="left")
+        self.test_btn = ttk.Button(ctrl_frame, text="🚀 รันชุดทดสอบอัตโนมัติทั้งหมด", command=self._run_pytest)
+        self.test_btn.pack(side="right")
+
+        # Summary Panel
+        stats_frame = ttk.Frame(self.test_tab, padding=(20, 0))
+        stats_frame.pack(fill="x")
+        
+        lbl_style = {"font": ("Inter", 10, "bold")}
+        val_style = {"font": ("JetBrains Mono", 11, "bold"), "foreground": "#A5D6A7"}
+        
+        # Grid for Stats
+        for lbl, var in [
+            ("รวมทั้งหมด:", self.test_total_var),
+            ("ผ่านแล้ว:", self.test_pass_var),
+            ("ล้มเหลว:", self.test_fail_var),
+            ("Coverage:", self.test_cov_var)
+        ]:
+            f = ttk.Frame(stats_frame)
+            f.pack(side="left", padx=(0, 30))
+            ttk.Label(f, text=lbl, font=("Inter", 10, "bold")).pack(side="left")
+            ttk.Label(f, textvariable=var, font=("JetBrains Mono", 11, "bold"), foreground="#A5D6A7").pack(side="left", padx=5)
+
+        # Split View
+        split_frame = ttk.Frame(self.test_tab, padding=20)
+        split_frame.pack(fill="both", expand=True)
+
+        # Left: Explanations
+        explain_frame = ttk.LabelFrame(split_frame, text=" คำอธิบายการทดสอบ ", padding=10)
+        explain_frame.pack(side="left", fill="both", expand=True)
+        
+        explanations = [
+            ("🧠 BCI & ML Classifier", "ทดสอบ: การแยกแยะคลื่นสมองจาก Numpy | ผลลัพธ์: ระบบต้องแปลความหมาย (Focus/Relax) ได้แม่นยำ > 60% เพื่อยืนยันว่า AI เข้าใจเจตนาผู้ใช้"),
+            ("📐 DAFT Validation", "ทดสอบ: การส่งข้อมูล Bio/Phy | ผลลัพธ์: ตรวจสอบว่าสูตรคณิตศาสตร์ Universal Symbols ทำงานถูกต้อง ข้อมูลไม่เพี้ยนระหว่างเชื่อมต่อ"),
+            ("⚖️ Ethics Engine (E-001)", "ทดสอบ: ความเป็นส่วนตัวของความคิด | ผลลัพธ์: ระบบต้อง 'บล็อก' สัญญาณที่ละเมิด Neurorights หรือระบุตัวตนผู้ใช้มากเกินไป"),
+            ("🔥 Brain Firewall", "ทดสอบ: สภาวะอารมณ์และแรงบังคับ | ผลลัพธ์: ป้องกันความเสียหายโดยการตัดสัญญาณทันทีหากตรวจพบความเครียดรุนแรงหรือการแฮ็กสมอง"),
+            ("🛑 HITL Checkpoint", "ทดสอบ: การทำงานร่วมกับมนุษย์ | ผลลัพธ์: ปุ่ม E-STOP ต้องตัดกระบวนการทั้งหมดภายใน 500ms เพื่อความปลอดภัยสูงสุดของผู้ใช้"),
+            ("🌐 E2E Protocol", "ทดสอบ: ประสิทธิภาพเน็ตเวิร์กโดยรวม | ผลลัพธ์: Latency ต่ำกว่า 50ms และข้อมูลต้องถึงปลายทาง 100% โดยไม่มีการตกหล่น")
+        ]
+        
+        for title, desc in explanations:
+            lbl = ttk.Label(explain_frame, text=title, font=("Inter", 10, "bold"), foreground="#00E676")
+            lbl.pack(anchor="w", pady=(5, 0))
+            txt = tk.Text(explain_frame, height=2, wrap="word", bg="#121212", fg="#B0B0B0", 
+                        font=("Inter", 9), bd=0, highlightthickness=0)
+            txt.insert("1.0", desc)
+            txt.config(state="disabled")
+            txt.pack(fill="x", pady=(0, 5))
+
+        # Right: Output
+        output_frame = ttk.LabelFrame(split_frame, text=" Live Test Output ", padding=10)
+        output_frame.pack(side="left", fill="both", expand=True, padx=(10, 0))
+        
+        self.test_log_area = scrolledtext.ScrolledText(output_frame, bg="#000000", fg="#FFFFFF", 
+                                                      font=("JetBrains Mono", 9))
+        self.test_log_area.pack(fill="both", expand=True)
 
     def _add_metric(self, parent, label_text, value_text):
         ttk.Label(parent, text=label_text).pack(anchor="w", pady=(5,0))
@@ -200,6 +289,50 @@ class BrainNetGUI:
         self.root.after(0, lambda: self.run_btn.config(state="normal"))
         self.is_running = False
 
+    def _run_pytest(self):
+        self.test_btn["state"] = "disabled"
+        self.test_total_var.set("...")
+        self.test_pass_var.set("...")
+        self.test_fail_var.set("...")
+        self.test_cov_var.set("...")
+        
+        self.test_log_area.delete("1.0", tk.END)
+        self.test_log_area.insert(tk.END, ">>> Initiating python -m pytest tests/ --cov=src/ ...\n\n")
+        
+        def run():
+            cflags = 0x08000000 if os.name == 'nt' else 0 # CREATE_NO_WINDOW
+            cmd = [sys.executable, "-m", "pytest", "tests/", "--cov=src/", "--cov-report=term-missing"]
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
+                                     text=True, bufsize=1, universal_newlines=True,
+                                     creationflags=cflags)
+            
+            full_out = ""
+            if process.stdout:
+                for line in process.stdout:
+                    self.log_queue.put(("TEST_LOG", line))
+                    full_out += line
+            
+            process.wait()
+            
+            # Parse results
+            pass_match = re.search(r"(\d+) passed", full_out)
+            fail_match = re.search(r"(\d+) failed", full_out)
+            err_match = re.search(r"(\d+) error", full_out)
+            cov_match = re.search(r"TOTAL\s+\d+\s+\d+\s+(\d+%)", full_out) # Better cov regex for term-missing
+            if not cov_match:
+                cov_match = re.search(r"Total coverage: (\d+\.?\d*%)", full_out)
+
+            n_pass = int(pass_match.group(1)) if pass_match else 0
+            n_fail = (int(fail_match.group(1)) if fail_match else 0) + (int(err_match.group(1)) if err_match else 0)
+            n_total = n_pass + n_fail
+            cov_val = cov_match.group(1) if cov_match else "N/A"
+            
+            self.log_queue.put(("TEST_SUMMARY", (n_total, n_pass, n_fail, cov_val)))
+            self.log_queue.put(("TEST_LOG", f"\n[INFO] Test suite exited with code {process.returncode}\n"))
+            self.root.after(0, lambda: self.test_btn.config(state="normal"))
+
+        threading.Thread(target=run, daemon=True).start()
+
     def _update_metrics_live(self, results):
         if not results: return
         
@@ -237,6 +370,20 @@ class BrainNetGUI:
                 elif category == "STREAM":
                     self.log_area.insert(tk.END, f"{msg}\n")
                     self.log_area.see(tk.END)
+                elif category == "TEST_LOG":
+                    self.test_log_area.insert(tk.END, msg)
+                    self.test_log_area.see(tk.END)
+                elif category == "TEST_SUMMARY":
+                    total, passed, failed, cov = msg
+                    self.test_total_var.set(str(total))
+                    self.test_pass_var.set(str(passed))
+                    self.test_fail_var.set(str(failed))
+                    self.test_cov_var.set(str(cov))
+                    
+                    if int(failed) > 0:
+                        self.test_log_area.insert(tk.END, f"\n❌ ตรวจพบข้อผิดพลาด {failed} จุด! กรุณาตรวจสอบรายละเอียดด้านบน\n")
+                    else:
+                        self.test_log_area.insert(tk.END, "\n✨ การทดสอบเสร็จสมบูรณ์: ผ่าน 100%\n")
                 else:
                     self.log_area.insert(tk.END, f"\n[{category.upper()}] {msg}\n", "bold")
                     self.log_area.see(tk.END)

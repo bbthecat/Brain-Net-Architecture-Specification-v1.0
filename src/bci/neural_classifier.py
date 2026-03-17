@@ -132,7 +132,7 @@ class NeuralClassifier:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         joblib.dump({"model": self._model, "encoder": self._encoder,
                      "accuracy": self._accuracy}, path)
-        print(f"[ML] Model saved → {path}  (accuracy={self._accuracy:.3f})")
+        print(f"[ML] Model saved -> {path}  (accuracy={self._accuracy:.3f})")
 
     @classmethod
     def load(cls, path: str) -> "NeuralClassifier":
@@ -143,7 +143,7 @@ class NeuralClassifier:
         obj._encoder  = data["encoder"]
         obj._accuracy = data.get("accuracy", 0.0)
         obj._trained  = True
-        print(f"[ML] Model loaded ← {path}  (accuracy={obj._accuracy:.3f})")
+        print(f"[ML] Model loaded <- {path}  (accuracy={obj._accuracy:.3f})")
         return obj
 
     @property
