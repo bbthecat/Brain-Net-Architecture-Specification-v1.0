@@ -1,4 +1,4 @@
-# 🧠 Brain-Net Protocol — Phase 1 MVP
+# 🧠 Brain-Net Protocol — Phase 1
 
 **Brain-Computer Interface Neural Communication Protocol**
 *Thought Transfer Protocol (TTP) with Cognitive Liberty Protection*
