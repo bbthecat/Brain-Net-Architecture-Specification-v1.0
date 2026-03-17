@@ -138,6 +138,6 @@ class TestQualityMetrics:
             path = os.path.join(tmpdir, "reports", "test_report.md")
             self.qm.export_markdown(path)
             assert os.path.exists(path)
-            content = open(path).read()
+            content = open(path, encoding="utf-8").read()
             assert "PMI" in content
             assert "Latency" in content

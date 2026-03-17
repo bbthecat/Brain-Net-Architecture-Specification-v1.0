@@ -143,7 +143,7 @@ class QualityMetrics:
 
     def export_json(self, path: str = "reports/quality_report.json"):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(self.generate_report(), f, indent=2)
         print(f"[Metrics] Report saved → {path}")
 
@@ -176,6 +176,6 @@ class QualityMetrics:
 Sprint 3 Target (≥3.5): {'✅ PASS' if pmi['meets_sprint3_target'] else '❌ FAIL'}
 MVP Target (≥4.2): {'✅ PASS' if pmi['meets_mvp_target'] else '❌ FAIL'}
 """
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(md)
         print(f"[Metrics] Markdown report saved → {path}")

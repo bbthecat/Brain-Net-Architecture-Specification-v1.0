@@ -63,14 +63,17 @@ class ConsensualHandshake:
         """Attempt to open a new session."""
         # C-001
         if arousal > 0.9:
+            self._record_rejection(source_id, dest_id, "C-001")
             return HandshakeResult(False, SessionState.REJECTED, "C-001",
                                    "Auto-reject: Panic state detected")
         # C-002
         if valence < -0.7:
+            self._record_rejection(source_id, dest_id, "C-002")
             return HandshakeResult(False, SessionState.REJECTED, "C-002",
                                    "Terminate: Subconscious dissent")
         # C-003
         if self._coercion_detected(source_id):
+            self._record_rejection(source_id, dest_id, "C-003")
             return HandshakeResult(False, SessionState.REJECTED, "C-003",
                                    "Block: Coercion marker detected")
         # C-004
@@ -83,6 +86,14 @@ class ConsensualHandshake:
 
         return HandshakeResult(False, SessionState.PENDING, "NONE",
                                "Insufficient consent score")
+
+    def _record_rejection(self, source_id: str, dest_id: str, rule: str):
+        # We need a unique key for rejections to count multiple ones from same source
+        # using a simple incrementing suffix or just storing a list of rejections
+        # would be better, but the coercion check expects them in _sessions
+        key = (source_id, dest_id, time.time())
+        session = Session(source_id=source_id, dest_id=dest_id, state=SessionState.REJECTED)
+        self._sessions[key] = session
 
     def is_session_active(self, source_id: str, dest_id: str) -> bool:
         session = self._sessions.get((source_id, dest_id))

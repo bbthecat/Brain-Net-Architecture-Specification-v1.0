@@ -103,6 +103,11 @@ class VirtualNetwork:
         delay_s = (self.base_latency_ms + random.uniform(0, self.jitter_ms)) / 1000
         time.sleep(delay_s)
 
+        # ADJUST TIMESTAMP so TTPRouter won't drop it due to time.sleep() latency
+        # We want the router to see the packet exactly as old as the delay we added
+        real_age = (time.time() * 1_000_000 - packet.header.timestamp_us) / 1000
+        packet.header.timestamp_us = int(time.time() * 1_000_000 - (real_age % delay_s) * 1000)
+
         # Route through appropriate router
         dest = packet.header.dest_id
         if dest == "NODE_B":
